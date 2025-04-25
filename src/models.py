@@ -59,7 +59,7 @@ class Favorite(db.Model):
     __table_args__ = (
         # In these lines we define where character and planet are null or not, in order to choose one option
         CheckConstraint(
-            '(character_id IS NOT NULL AND planet_id IS NULL) OR (character_id IS NULL AND planet_id IS NOT NULL)',
+            '(characters_id IS NOT NULL AND planets_id IS NULL) OR (characters_id IS NULL AND planets_id IS NOT NULL)',
             name='check_one_favorite_type'
         ),
     )
