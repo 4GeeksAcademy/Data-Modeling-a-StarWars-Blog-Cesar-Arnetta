@@ -9,6 +9,7 @@ db = SQLAlchemy()
 # For use a selective value, this case, male y female, we the imported method Enum, from my sqlaclhemy
 gender_state = Enum('male', 'female', name='gender_enum')
 
+
 class User(db.Model):
     __tablename__ = "users"
     users_id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -48,6 +49,8 @@ class Favorite(db.Model):
     # The user can save as favorite planets and characteres. In order to get a good record the user only can save 1 planet or 1 characteer
     users_id: Mapped[int] = mapped_column(
         ForeignKey('users.users_id'), nullable=False)
+    # The typing Optional allows you to put another type of data instead of int. We switch nullable to true in order
+    # to accept the argument value null or not after these lines
     planets_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey('planets.planets_id'), nullable=True)
     characters_id: Mapped[Optional[int]] = mapped_column(
