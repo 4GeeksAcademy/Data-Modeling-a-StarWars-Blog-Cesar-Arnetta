@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from sqlalchemy import String, Boolean, Integer, DateTime, func, ForeignKey, Enum, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -8,8 +8,6 @@ db = SQLAlchemy()
 
 # For use a selective value, this case, male y female, we the imported method Enum, from my sqlaclhemy
 gender_state = Enum('male', 'female', name='gender_enum')
-favorite_type = Enum('character', 'type', name='favorite_type_enum')
-
 
 class User(db.Model):
     __tablename__ = "users"
@@ -50,12 +48,10 @@ class Favorite(db.Model):
     # The user can save as favorite planets and characteres. In order to get a good record the user only can save 1 planet or 1 characteer
     users_id: Mapped[int] = mapped_column(
         ForeignKey('users.users_id'), nullable=False)
-    # The choose what type of favorite want to add
-    favorite_type: Mapped[str] = mapped_column(favorite_type, nullable=False)
-    planets_id: Mapped[int] = mapped_column(
-        ForeignKey('planets.planets_id'), nullable=False)
-    characters_id: Mapped[int] = mapped_column(
-        ForeignKey('characters.characters_id'), nullable=False)
+    planets_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey('planets.planets_id'), nullable=True)
+    characters_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey('characters.characters_id'), nullable=True)
     __table_args__ = (
         # In these lines we define where character and planet are null or not, in order to choose one option
         CheckConstraint(
