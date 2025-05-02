@@ -40,7 +40,7 @@ class Planet(db.Model):
     terrain: Mapped[str] = mapped_column(String(250), nullable=False)
     # The characters live in planets
     who_live_here: Mapped[int] = mapped_column(
-        ForeignKey('characters.characters_id'), nullable=False)
+        ForeignKey('characters.characters_id'), nullable=True)
 
 
 class Favorite(db.Model):
