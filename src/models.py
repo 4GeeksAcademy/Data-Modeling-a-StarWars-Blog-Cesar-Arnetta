@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from typing import List, Optional
-from sqlalchemy import String, Boolean, Integer, DateTime, func, ForeignKey, Enum, CheckConstraint
+from sqlalchemy import String, Integer, DateTime, func, ForeignKey, Enum, CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 db = SQLAlchemy()
@@ -18,6 +18,7 @@ class User(db.Model):
     fisrt_name: Mapped[str] = mapped_column(String(250), nullable=False)
     last_name: Mapped[str] = mapped_column(String(250), nullable=False)
     password: Mapped[str] = mapped_column(String(128), nullable=False)
+    favorites: Mapped[List["Favorite"]] = relationship("Favorite", back_populates = "user")
 
 
 class Character(db.Model):
@@ -30,7 +31,8 @@ class Character(db.Model):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     update_at: Mapped[datetime] = mapped_column(
         DateTime, default=func.now(), onupdate=func.now())
-
+    planets: Mapped[List["Planet"]] = relationship("Planet", back_populates = "character")
+    favorites: Mapped[List["Favorite"]] = relationship("Favorite", back_populates = "character")
 
 class Planet(db.Model):
     __tablename__ = "planets"
@@ -41,6 +43,9 @@ class Planet(db.Model):
     # The characters live in planets
     who_live_here: Mapped[int] = mapped_column(
         ForeignKey('characters.characters_id'), nullable=True)
+    character: Mapped["Character"] = relationship(
+        "Character", back_populates="planets", foreign_keys=[who_live_here])
+    favorites: Mapped[List["Favorite"]] = relationship("Favorite", back_populates = "planet")
 
 
 class Favorite(db.Model):
@@ -62,6 +67,12 @@ class Favorite(db.Model):
             name='check_one_favorite_type'
         ),
     )
+    user: Mapped["User"] = relationship(
+        "User", back_populates="favorites", foreign_keys=[users_id])
+    character: Mapped["Character"] = relationship(
+        "Character", back_populates="favorites", foreign_keys=[characters_id])
+    planet: Mapped["Planet"] = relationship(
+        "Planet", back_populates="favorites", foreign_keys=[planets_id])
 
 # Favorites
 # --
