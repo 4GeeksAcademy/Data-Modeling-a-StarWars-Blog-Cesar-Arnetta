@@ -1,8 +1,9 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, date
 from typing import List, Optional
-from sqlalchemy import String, Integer, DateTime, func, ForeignKey, Enum, CheckConstraint
+from sqlalchemy import String, Integer, DateTime, func, ForeignKey, Enum, CheckConstraint, Date
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 db = SQLAlchemy()
 
@@ -26,14 +27,15 @@ class Character(db.Model):
     __tablename__ = "characters"
     characters_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(250), nullable=False)
-    birth_year: Mapped[str] = mapped_column(String(250), nullable=False)
+    birth_year: Mapped[date] = mapped_column(Date, nullable=False)
     gender: Mapped[str] = mapped_column(gender_state, nullable=False)
     # That's how we created an automated date. For Create and update datetime record.
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     update_at: Mapped[datetime] = mapped_column(
         DateTime, default=func.now(), onupdate=func.now())
-    planets: Mapped[List["Planet"]] = relationship(
-        "Planet", back_populates="character")
+    planet_id: Mapped[int] = mapped_column(ForeignKey('planets.planets_id'), nullable=False)
+    planet: Mapped["Planet"] = relationship(
+        "Planet", back_populates="characters")
     favorites: Mapped[List["Favorite"]] = relationship(
         "Favorite", back_populates="character")
 
@@ -45,10 +47,8 @@ class Planet(db.Model):
     population: Mapped[int] = mapped_column(Integer, nullable=True)
     terrain: Mapped[str] = mapped_column(String(250), nullable=False)
     # The characters live in planets
-    who_live_here: Mapped[int] = mapped_column(
-        ForeignKey('characters.characters_id'), nullable=True)
-    character: Mapped["Character"] = relationship(
-        "Character", back_populates="planets", foreign_keys=[who_live_here])
+    characters: Mapped[list["Character"]] = relationship(
+        "Character", back_populates="planet")
     favorites: Mapped[List["Favorite"]] = relationship(
         "Favorite", back_populates="planets")
 
@@ -96,12 +96,13 @@ class Favorite(db.Model):
 
 # Characters
 # --
-# id int pk FK >- Planets.characters_id
+# id int pk
 # name varchar(250)
-# birth_year string
+# birth_year date
 # gender string
 # created_at date
 # update_at date
+# planet_id int FK >- planets.planets_id
 
 # Planets
 # --
@@ -110,3 +111,4 @@ class Favorite(db.Model):
 # population int
 # terrain string
 # characters_id int FK
+
